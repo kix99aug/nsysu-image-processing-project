@@ -5,12 +5,27 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
   <link rel="stylesheet" href="./stylesheets/image.css">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
     crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+  <style>
+    #RGBHSV canvas {
+      max-width: 100%;
+      max-height: 100%;
+      height: auto;
+    }
+
+    canvas#plate {
+      width: 160px;
+    }
+  </style>
   <title>Document</title>
 </head>
 
@@ -18,7 +33,7 @@
   <header>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark p-0 h-100">
       <div class="container-fluid">
-        <a class="navbar-brand ms-4 me-5" href="#">Image Processing</a>
+        <a class="navbar-brand ms-4 me-5" href="./index.html">Image Processing</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
           aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -26,14 +41,80 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item dropdown">
-              <a class="nav-link active dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                data-bs-toggle="dropdown" aria-expanded="false">
+              <a class="nav-link active dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 File
               </a>
               <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <li><a class="dropdown-item" id="openfile" href="#">Open</a></li>
-                <li><a class="dropdown-item" href="#">Save</a></li>
-                <li><a class="dropdown-item" href="#">Close</a></li>
+                <li><a class="dropdown-item" id="openfile" href="#">📁 Open (Ctrl+O)</a></li>
+                <li><a class="dropdown-item" href="#" onclick="parent.hideAll()">❌ Close</a></li>
+              </ul>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link active dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Basic
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <li><a class="dropdown-item" data-bs-toggle="offcanvas" href="#RGBHSV" role="button"
+                    aria-controls="RGBHSV">RGB & HSV</a></li>
+                <li><a class="dropdown-item" href="#" onclick="greyout()">Greyout</a></li>
+                <li><a class="dropdown-item" data-bs-toggle="offcanvas" href="#scaleMenu" role="button"
+                    aria-controls="scaleMenu">
+                    Scale
+                  </a></li>
+                <li><a class="dropdown-item" data-bs-toggle="offcanvas" href="#rotateMenu" role="button"
+                    aria-controls="rotateMenu">
+                    Rotate
+                  </a></li>
+                <li><a class="dropdown-item" data-bs-toggle="offcanvas" href="#brit" role="button" aria-controls="brit">
+                    Brightness
+                  </a></li>
+
+                <li><a class="dropdown-item" data-bs-toggle="offcanvas" href="#transparency" role="button"
+                    aria-controls="transparency"
+                    onclick="(async()=>{clearCanvas('#transparency canvas');image2 = await openImageForCompare();})()">
+                    Transparency
+                  </a></li>
+                <li><a class="dropdown-item" href="#" onclick="negativeRGB()">RGB Negative</a></li>
+                <li><a class="dropdown-item" href="#" onclick="negativeGrey()">Greylevel Negative</a></li>
+
+                <li><a class="dropdown-item" data-bs-toggle="offcanvas" href="#bitplane" role="button"
+                    aria-controls="bitplane" onclick="bitplane()">Bit-plane Slicing</a></li>
+
+                <li><a class="dropdown-item" data-bs-toggle="offcanvas" href="#bitplane" role="button"
+                    aria-controls="bitplane" onclick="bitplaneGrayCode()">Bit-plane Slicing (Gray Code)</a></li>
+
+                <li><a class="dropdown-item" data-bs-toggle="offcanvas" href="#watermark" role="button"
+                    aria-controls="watermark" onclick="watermark()">Watermark</a></li>
+                <li><a class="dropdown-item" data-bs-toggle="offcanvas" role="button" onclick="snr()">SNR</a></li>
+              </ul>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link active dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Histogram
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <li><a class="dropdown-item" data-bs-toggle="offcanvas" href="#histogram" role="button"
+                    aria-controls="histogram" onclick="getHistogram()">Histogram</a></li>
+                <li><a class="dropdown-item" data-bs-toggle="offcanvas" href="#histogram" role="button"
+                    aria-controls="histogram" onclick="histoEqual()">Histogram equalization</a></li>
+              </ul>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link active dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Filter
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown" id="xxx">
+                <li><a class="dropdown-item" href="#" role="button" onclick="outlier()">Outlier</a></li>
+                <li><a class="dropdown-item" href="#" role="button" onclick="medianS()">Median (Square)</a></li>
+                <li><a class="dropdown-item" href="#" role="button" onclick="medianC()">Median (Cross)</a></li>
+                <li><a class="dropdown-item" href="#" role="button" onclick="pMedian()">Pseudo Median</a></li>
+                <li><a class="dropdown-item" href="#" role="button" onclick="avg()">Lowpass</a></li>
+                <li><a class="dropdown-item" href="#" role="button" onclick="highpass()">Highpass</a></li>
+                <li><a class="dropdown-item" href="#" role="button" onclick="ec()">Edge Crispening</a></li>
+                <li><a class="dropdown-item" href="#" role="button" onclick="hb()">High-boost Filter</a></li>
+                <li><a class="dropdown-item" href="#" role="button" onclick="rb()">Roberts</a></li>
+                <li><a class="dropdown-item" href="#" role="button" onclick="so()">Sobel</a></li>
+                <li><a class="dropdown-item" href="#" role="button" onclick="pr()">Prewitt</a></li>
               </ul>
             </li>
           </ul>
@@ -42,64 +123,299 @@
     </nav>
   </header>
   <main class="container-fluid">
-    <div class="modal" tabindex="-1">
-      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Modal title</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <p>Modal body text goes here.</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Save changes</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="row h-100">
+    <div class="row h-100 overflow-hidden">
       <div id="original" class="col">
         <div class="canvasBox col h-100">
-          <canvas width="256" height="256"></canvas>
+          <canvas width="256" height="256" class="img-fluid"></canvas>
         </div>
-        <footer class="bg-dark text-light px-3">
-          <span id="detail">...</span>
-        </footer>
       </div>
-      <div id="modified" class="col">
-        <div class="canvasBox col h-100">
-          <canvas width="256" height="256"></canvas>
+      <div class="offcanvas offcanvas-top" tabindex="-1" id="commonResult">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="commonResultTitle"></h5>
+          <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
-        <footer class="bg-dark text-light px-3">
-          <span id="detail">...</span>
-        </footer>
+        <div class="offcanvas-body">
+          <div id="filterSize">
+            <label class="form-label">Filter size: 3</label>
+            <input type="range" class="form-range" min="3" max="9" step="2" value="3">
+          </div>
+          <div id="hbA">
+            <label for="hbA" class="form-label">A of High-boost: 1</label>
+            <input type="range" class="form-range" id="hbA" min="1" max="2" step="0.05" value="1">
+          </div>
+          <div class="body">
+            <canvas width="256" height="256"></canvas>
+          </div>
+          <div id="resultDetail">...</div>
+        </div>
       </div>
-      <div class="col-3 bg-light p-3">
-        <h2>RGB</h2>
-        <label for="colorR" class="form-label">Red</label>
-        <input type="range" class="form-range color" id="colorR" min="0" max="255" value="255">
-        <label for="colorG" class="form-label">Green</label>
-        <input type="range" class="form-range color" id="colorG" min="0" max="255" value="255">
-        <label for="colorB" class="form-label">Blue</label>
-        <input type="range" class="form-range color" id="colorB" min="0" max="255" value="255">
-        <h2>Scale</h2>
-        <label for="scale" class="form-label">Scale</label>
-        <input type="range" class="form-range color" id="scale" min="0.5" max="10" step="0.1" value="1"
-          oninput="document.querySelector('div#scaleVal').innerHTML = this.value+'倍'">
-        <div id="scaleVal" class="mb-3">1倍</div>
-        <div class="d-flex align-items-center justify-content-around">
-          <button class="btn btn-primary" onclick="resizeSimple(document.querySelector('input#scale').value)">Nearest
-            neighbor</button>
-          <button class="btn btn-primary" onclick="resizeLinear(document.querySelector('input#scale').value)">Linear
-            interpolation</button>
+      <div class="offcanvas offcanvas-top  h-auto" tabindex="-1" id="transparency">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="transparency">Transparency</h5>
+          <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
+        <div class="offcanvas-body">
+          <div>
+            <label for="transparency" class="form-label">50%</label>
+            <input type="range" class="form-range" id="transparency" min="0" max="100" value="50">
+            <div class="body">
+              <canvas width="256" height="256"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="offcanvas offcanvas-top  h-auto" tabindex="-1" id="brit">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="brit">Brightness</h5>
+          <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <div>
+            <label for="brit" class="form-label">100%</label>
+            <input type="range" class="form-range" id="brit" min="0" max="100" value="100">
+            <div class="body">
+              <canvas width="256" height="256"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="offcanvas offcanvas-top  h-auto" tabindex="-1" id="rotateMenu">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="scaleMenuLabel">Rotate</h5>
+          <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <div>
+            <label for="rotateRatio" class="form-label">Degree 0°</label>
+            <input type="range" class="form-range" id="rotateRatio" min="0" max="360" value="0">
+            <div class="body">
+              <canvas width="256" height="256"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="offcanvas offcanvas-top h-auto" tabindex="-1" id="scaleMenu">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title">Scale</h5>
+          <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <div>
+            <label for="scaleRatio" class="form-label">Ratio 1x</label>
+            <input type="range" class="form-range" id="scaleRatio" min="0.1" max="10.0" step="0.1" value="1.0">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1"
+                checked>
+              <label class="form-check-label" for="exampleRadios1">
+                Pixel replication
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="option2">
+              <label class="form-check-label" for="exampleRadios2">
+                Linear interpolation
+              </label>
+            </div>
+            <div class="body">
+              <canvas width="256" height="256"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="offcanvas offcanvas-top h-auto" tabindex="-1" id="RGBHSV">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title">RGB & HSV</h5>
+          <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <div>
+            <div class="container">
+              <div class="row">
+                <div class="col-sm">
+                  <canvas></canvas>
+                </div>
+                <div class="col-sm">
+                  <canvas></canvas>
+                </div>
+                <div class="col-sm">
+                  <canvas></canvas>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm">
+                  <canvas></canvas>
+                </div>
+                <div class="col-sm">
+                  <canvas></canvas>
+                </div>
+                <div class="col-sm">
+                  <canvas></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="offcanvas offcanvas-top h-auto" tabindex="-1" id="bitplane">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title">Bit-plane Slicing</h5>
+          <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <div>
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col">
+                  <canvas></canvas>
+                </div>
+                <div class="col">
+                  <canvas></canvas>
+                </div>
+                <div class="col">
+                  <canvas></canvas>
+                </div>
+                <div class="col">
+                  <canvas></canvas>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <canvas></canvas>
+                </div>
+                <div class="col">
+                  <canvas></canvas>
+                </div>
+                <div class="col">
+                  <canvas></canvas>
+                </div>
+                <div class="col">
+                  <canvas></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="offcanvas offcanvas-top h-auto" tabindex="-1" id="histogram">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title">Histogram</h5>
+          <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <div>
+            <div class="container-fluid">
+              <div class="row mb-3">
+                <div class="col-sm">
+                  <canvas></canvas>
+                  <h3 class="text-center">Red histogram</h3>
+                </div>
+                <div class="col-sm">
+                  <canvas></canvas>
+                  <h3 class="text-center">Green histogram</h3>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-sm">
+                  <canvas></canvas>
+                  <h3 class="text-center">Blue histogram</h3>
+                </div>
+                <div class="col-sm">
+                  <canvas></canvas>
+                  <h3 class="text-center">Greyscale histogram</h3>
+                </div>
+              </div>
+              <div id="eqR" class="row">
+                <canvas></canvas>
+                <h3 class="text-center">Result</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="offcanvas offcanvas-top h-auto" tabindex="-1" id="watermark">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title">Watermark</h5>
+          <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <div>
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-sm">
+                  <canvas></canvas>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm">
+                  <canvas></canvas>
+                </div>
+                <div class="col-sm">
+                  <canvas></canvas>
+                </div>
+                <div class="col-sm">
+                  <canvas></canvas>
+                </div>
+                <div class="col-sm">
+                  <canvas></canvas>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm">
+                  <canvas></canvas>
+                </div>
+                <div class="col-sm">
+                  <canvas></canvas>
+                </div>
+                <div class="col-sm">
+                  <canvas></canvas>
+                </div>
+                <div class="col-sm">
+                  <canvas></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="offcanvas offcanvas-top h-auto" tabindex="-1" id="contrastStretching">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title">Contrast Stretching</h5>
+          <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <div>
+            <label for="scaleRatio" class="form-label">Ratio 1x</label>
+            <input type="range" class="form-range" id="scaleRatio" min="0.1" max="10.0" step="0.1" value="1.0">
+            <div class="body">
+              <canvas width="256" height="256"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-2 bg-light p-3">
+        <h2>Info</h2>
+        <pre id="info"></pre>
+        <canvas id="plate" width="256" height="256"></canvas>
       </div>
     </div>
   </main>
+  <footer class="bg-dark text-light px-3">
+    <span id="detail">...</span>
+  </footer>
   <input type="file" name="file" id="file" accept=".pcx,.bmp" hidden>
-  <script src="./scripts/image.js"></script>
+  <script>
+    // var myOffcanvas = document.getElementById('RGBHSV')
+    // var bsOffcanvas = new bootstrap.Offcanvas(myOffcanvas)
+    // bsOffcanvas.toggle()
+    // $("#openfile").click()
+  </script>
+  <script src="./scripts/imageBase.js"></script>
+  <script src="./scripts/imageBasic.js"></script>
+  <script src="./scripts/imageHistogram.js"></script>
+  <script src="./scripts/imageFilter.js"></script>
 </body>
 
 </html>

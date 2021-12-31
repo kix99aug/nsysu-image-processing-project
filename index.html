@@ -11,15 +11,72 @@
         integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
         crossorigin="anonymous"></script>
     <title>Document</title>
+    <style>
+        #lenna {
+            border-radius: 50%;
+            animation: 5s linear 0s infinite color;
+        }
+
+        @keyframes color {
+            from {
+                filter: hue-rotate(0);
+            }
+
+            to {
+                filter: hue-rotate(2turn);
+            }
+        }
+    </style>
 </head>
 
-<body style="width: 100vw; height: 100vh;">
-    <div class="container w-100 h-100 d-flex align-items-center justify-content-center">
-        <div class="w-25 d-flex justify-content-around">
-            <a class="btn btn-primary" href="./image.html">Image</a>
-            <a class="btn btn-primary" href="./video.html">Video</a>
+<body class="d-flex justify-content-center align-items-center bg-dark" style="width: 100vw; height: 100vh; ">
+    <div class="d-flex flex-column w-50 h-50 justify-content-around align-items-center">
+        <div class="d-flex w-75 justify-content-center align-items-center">
+            <img id="lenna" class="img-fluid w-25" src="./images/bmp/24-lena.bmp" alt="">
+            <div class="d-flex flex-column">
+
+                <h1 class="ms-5 text-light" style="font-family: 'Bauhaus 93';">Image processing project</h1>
+                <h1 class="ms-5 text-light" style="font-family: 'Bauhaus 93'; text-align: right;">By M103040022</h1>
+            </div>
+        </div>
+        <div class="w-75 d-flex justify-content-around">
+            <a class="btn btn-secondary btn-lg" href="#image" data-bs-toggle="offcanvas">Image</a>
+            <a class="btn btn-secondary btn-lg" href="#videoEncoding" data-bs-toggle="offcanvas">Video Encoding</a>
+            <a class="btn btn-secondary btn-lg" href="#videoDecoding" data-bs-toggle="offcanvas">Video Decoding</a>
+            <a class="btn btn-secondary btn-lg" href="#bouncingBall" data-bs-toggle="offcanvas">Bouncing Ball</a>
+        </div>
+
+        <div class="offcanvas offcanvas-top h-100" tabindex="-1" id="videoDecoding">
+            <iframe class="offcanvas-body p-0" src="./videoDecoding.html" frameborder="0"></iframe>
+        </div>
+        <div class="offcanvas offcanvas-top h-100" tabindex="-1" id="videoEncoding">
+            <iframe class="offcanvas-body p-0" src="./videoEncoding.html" frameborder="0"></iframe>
+        </div>
+        <div class="offcanvas offcanvas-top h-100" tabindex="-1" id="image">
+            <iframe class="offcanvas-body p-0" src="./image.html" frameborder="0"></iframe>
+        </div>
+        <div class="offcanvas offcanvas-top h-100" tabindex="-1" id="bouncingBall">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title"></h5>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
+                    aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body d-flex justify-content-center align-items-center">
+                <canvas id="bouncingBall" width="1280" height="720"></canvas>
+                <script src="./scripts/bouncingBall.js"></script>
+            </div>
         </div>
     </div>
+    <script>
+        var offcanvasElementList = [].slice.call(document.querySelectorAll('.offcanvas'))
+        var offcanvasList = offcanvasElementList.map(function (offcanvasEl) {
+            return new bootstrap.Offcanvas(offcanvasEl)
+        })
+        function hideAll() {
+            offcanvasList.forEach(o => o.hide())
+            document.querySelectorAll('iframe').forEach(ele => ele.src = ele.src)
+        }
+    </script>
 </body>
 
 </html>

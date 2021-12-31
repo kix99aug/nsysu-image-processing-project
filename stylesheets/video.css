@@ -4,11 +4,11 @@ body {
 }
 
 header {
-    height: 10%;
+    height: 10vh;
 }
 
 main {
-    height: 90%;
+    height: 90vh;
 }
 
 .canvasBox {
@@ -18,10 +18,20 @@ main {
 }
 
 .block {
-    /* background: red; */
     display: flex;
-    align-items: center;
+    align-items: start;
     justify-content: center;
+}
+
+canvas {
+    background: rgba(0,0,0,0.3);
+}
+
+#psnr {
+    background: none;
+    width: 512px;
+    height: 256px;
+
 }
 
 .block > canvas {
@@ -31,14 +41,20 @@ main {
 
 .zoom {
     display: flex;
-    height: 100%;
     margin-left: 10px;
     flex-direction: column;
     justify-content: start;
-    padding-top: 64px;
 }
 
 .zoom canvas {
-    height: 64px;
-    width: 64px;
+    height: 128px;
+    width: 128px;
+}
+
+#top , #bottom {
+    height: 40vh;
+}
+
+#control {
+    height: 10vh;
 }
