@@ -237,6 +237,7 @@ function rbF(f) {
 let _a, _b, _img
 
 function rb() {
+    lastFunction = rb
     let f = [
         [
             [1, 0],
@@ -264,6 +265,7 @@ function rb() {
     $("div#filterSize").hide()
 }
 function so() {
+    lastFunction = so
     let f = [
         [
             [+1, 0, -1],
@@ -287,7 +289,7 @@ function so() {
     $("div#filterSize").hide()
 }
 function pr() {
-
+    lastFunction = pr
     let f = [
         [
             [+1, 0, -1],
