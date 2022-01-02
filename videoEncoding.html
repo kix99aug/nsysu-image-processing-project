@@ -12,12 +12,14 @@
     integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
     crossorigin="anonymous"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <title>Document</title>
+  <title>Video Encoding</title>
 </head>
 
 <body>
   <header>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark p-0 h-100">
+      <button type="button" class="btn-close btn-close-white text-reset" onclick="parent.hideAll()"
+        style="position: absolute;right: 10px; top:10px;"></button>
       <div class="container-fluid">
         <a class="navbar-brand ms-4 me-5" href="./index.html">Video Processing</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
@@ -86,6 +88,7 @@
               <option value="1">MAD</option>
               <option value="2">MSD</option>
               <option selected value="3">PDC</option>
+              <option value="4">Integral Projection</option>
             </select>
             <div class="d-flex justify-content-center align-items-center">
               <label class="form-label text-light me-2 mb-0" for="threshold">Threshold</label>

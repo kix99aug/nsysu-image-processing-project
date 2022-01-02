@@ -13,6 +13,18 @@
         brightness = $("input#brit").val()
         requestAnimationFrame(light)
     })
+
+    $("#thresholding input").on("input", () => {
+        $("#thresholding label").text("Threshold = " + $("#thresholding input").val())
+        threshold = $("#thresholding input").val()
+        requestAnimationFrame(thresholding)
+    })
+
+
+    $("#thresholding #otsu").on("click", () => {
+        $("#thresholding input").val(otsu())
+        $("#thresholding input").trigger("input")
+    })
     $("input#transparency").on("input", () => {
         $("label[for='transparency']").text($("input#transparency").val() + "%")
         transparency = $("input#transparency").val()
@@ -26,11 +38,10 @@
     $("[href='#RGBHSV']").click(() => {
         RGBHSV()
     })
-    let ctx = Array.prototype.map.call($("#histogram canvas"), x => x.getContext("2d"))
+    let ctx = Array.prototype.map.call($("#histogram .chart canvas,#histogram .chart2 canvas"), x => x.getContext("2d"))
     let i = 0, labels = []
     while (i < 256) labels.push(i++)
     ctx.forEach((c, i) => {
-        if (i == 4) return
         charts[i] = new Chart(c, {
             data: {
                 labels: labels,
@@ -378,6 +389,84 @@ async function snr() {
         }
     }
     let ans = 10 * Math.log10(top / bot)
-    update(image2,"SNR: "+ans.toString())
+    update(image2, "SNR: " + ans.toString())
     $("div#filterSize").hide()
 }
+
+let down = false, startX = 0, startY = 0, circle = false
+
+function ellipse(context, x, y, a, b) {
+    context.save();
+    var r = (a > b) ? a : b;
+    var ratioX = a / r;
+    var ratioY = b / r;
+    context.scale(ratioX, ratioY);
+    context.beginPath();
+    context.arc(x / ratioX, y / ratioY, r, 0, 2 * Math.PI, false);
+    context.closePath();
+    context.restore();
+    context.stroke();
+}
+
+$("#cut input").on("input", () => {
+    circle = $("#cut input")[0].checked
+})
+
+function cutPrepare() {
+    let canvas = $("#cut canvas")[0]
+    let ctx = canvas.getContext("2d")
+    canvas.width = image.width
+    canvas.height = image.height
+    ctx.putImageData(image, 0, 0)
+    $("#cut input")[0].checked = false
+    $("#cut input").trigger("input")
+    $("#cut .row").empty()
+}
+
+function cutInit() {
+    let canvas = $("#cut canvas")[0]
+    let ctx = canvas.getContext("2d")
+
+    $(canvas).on("mousedown", e => {
+        down = true
+        startX = e.offsetX
+        startY = e.offsetY
+    })
+
+    $(canvas).on("mousemove", e => {
+        if (e.offsetX < 0 || e.offsetX >= image.width || e.offsetY < 0 || e.offsetY >= image.height || !down) return
+        ctx.setLineDash([10]);
+        ctx.putImageData(image, 0, 0)
+        if (!circle) ctx.strokeRect(startX, startY, e.offsetX - startX, e.offsetY - startY)
+        else ellipse(ctx, startX + (e.offsetX - startX) / 2, startY + (e.offsetY - startY) / 2, (e.offsetX - startX) / 2, (e.offsetY - startY) / 2)
+    })
+
+    $(canvas).on("mouseup", e => {
+        down = false
+        ctx.putImageData(image, 0, 0)
+        let newImage = new ImageData(Math.abs(e.offsetX - startX), Math.abs(e.offsetY - startY))
+        let newCanvas = document.createElement("canvas")
+        newCanvas.width = newImage.width
+        newCanvas.height = newImage.height
+        let newCtx = newCanvas.getContext("2d")
+
+        for (let i = 0; i < newImage.height; i++) {
+            for (let j = 0; j < newImage.width; j++) {
+                if (circle) {
+                    let x = j - newImage.width / 2
+                    let y = i - newImage.height / 2
+                    if (x * x / (newImage.width / 2) / (newImage.width / 2) + y * y / (newImage.height / 2) / (newImage.height / 2) > 1) continue
+                }
+                let p = getPixel(j + startX, i + startY)
+                putPixel(newImage, j, i, p)
+            }
+        }
+        newCtx.putImageData(newImage, 0, 0)
+        let a = $("<div class='col'></div>")
+        a.append(newCanvas)
+        $("#cut .row").append(a)
+    })
+}
+
+cutInit()
+

@@ -1,16 +1,27 @@
+function getRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+
 (function () {
-    let balls = [
-        // { x: 100, y: 100, r: 16, a: 80, v: 2 },
-        // { x: 200, y: 200, r: 16, a: 50, v: 1.2 },
-        // { x: 300, y: 300, r: 16, a: 210, v: 1.4 },
-        // { x: 80, y: 80, r: 16, a: 30, v: 1 }
-    ]
+    let balls = []
     let canvas = document.querySelector("canvas#bouncingBall")
     let ctx = canvas.getContext("2d")
 
     function randomBall() {
         let r = Math.random() * 30 + 10
-        let ball = { x: Math.random() * (canvas.width - r), y: Math.random() * (canvas.height - r), r: r, a: Math.random() * 360, v: (10 + Math.random() * 30) / r }
+        let ball = {
+            x: Math.random() * (canvas.width - r),
+            y: Math.random() * (canvas.height - r),
+            r: r,
+            a: Math.random() * 360,
+            v: (10 + Math.random() * 30) / r,
+            c: getRandomColor()
+        }
         balls.push(ball)
     }
 
@@ -50,7 +61,8 @@
                         balls[i].a = Math.random() * 180 + 180
                         balls[j].a = Math.random() * 180
                     }
-                    let mv1 = balls[i].v * balls[i].r, mv2 = balls[j].v * balls[j].r
+                    let mv1 = balls[i].v * balls[i].r,
+                        mv2 = balls[j].v * balls[j].r
                     balls[i].v = mv2 / balls[i].r
                     balls[j].v = mv1 / balls[j].r
                     balls[i].x += Math.sin(balls[i].a / 180 * Math.PI) * balls[i].v
@@ -65,6 +77,7 @@
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height)
         for (let i in balls) {
+            ctx.fillStyle = balls[i].c
             ctx.beginPath()
             ctx.arc(balls[i].x, balls[i].y, balls[i].r, 0, Math.PI * 2)
             ctx.fill()
@@ -72,9 +85,7 @@
         requestAnimationFrame(draw)
     }
     setInterval(move, 1)
-
     requestAnimationFrame(draw)
-
     document.addEventListener("keypress", e => {
         if (e.code == "Space") randomBall()
     })

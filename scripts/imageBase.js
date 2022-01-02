@@ -113,6 +113,8 @@ file.addEventListener("change", e => {
         rotate()
         light()
         resizeSimple()
+        $("h2").show()
+        // huffman()
     }
     reader.readAsArrayBuffer(loadedFile)
 })
@@ -170,19 +172,23 @@ function openImageForCompare() {
                     let data = array.slice(54)
                     readdata24bmp(decodedHeader, data)
                 } else if (decodedHeader.bitsPerPixel == 32) {
-                    bmp = true
-                    let img = document.createElement("img")
-                    img.src = URL.createObjectURL(loadedFile)
-                    img.style.display = "none"
-                    document.body.append(img)
-                    img.onload = function () {
-                        width = img.width
-                        height = img.height
-                        canvasOriginal.width = width
-                        canvasOriginal.height = height
-                        ctxOriginal.drawImage(img, 0, 0)
-                        image = ctxOriginal.getImageData(0, 0, width, height)
-                    }
+                    await new Promise(function (_resolve, reject) {
+                        bmp = true
+                        let img = document.createElement("img")
+                        img.src = URL.createObjectURL(loadedFile)
+                        img.style.display = "none"
+                        document.body.append(img)
+    
+                        img.onload = function () {
+                            width = img.width
+                            height = img.height
+                            canvasOriginal.width = width
+                            canvasOriginal.height = height
+                            ctxOriginal.drawImage(img, 0, 0)
+                            image = ctxOriginal.getImageData(0, 0, width, height)
+                            _resolve(image)
+                        }
+                    })
                 }
             }
             if(!bmp) loadImage(decodedHeader, palette256)

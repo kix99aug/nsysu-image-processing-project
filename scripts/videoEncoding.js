@@ -116,20 +116,53 @@ function draw() {
 
 
 function compare(ref, target, pdcThreshold) {
-    let sum = 0
-    for (let i = 0; i < ref.length / 4; i++) {
-        switch ($("[name='criteria']").val()) {
-            case "1":
-                sum += Math.abs(ref[i * 4 + 0] - target[i * 4 + 0])
-                break
-            case "2":
-                sum += Math.pow(ref[i * 4 + 0] - target[i * 4 + 0], 2)
-                break
-            case "3":
-                sum += Math.abs(ref[i * 4 + 0] - target[i * 4 + 0]) < pdcThreshold ? 0 : 1
+    if ($("[name='criteria']").val() != "4") {
+        let sum = 0
+        for (let i = 0; i < ref.length / 4; i++) {
+            switch ($("[name='criteria']").val()) {
+                case "1":
+                    sum += Math.abs(ref[i * 4 + 0] - target[i * 4 + 0])
+                    break
+                case "2":
+                    sum += Math.pow(ref[i * 4 + 0] - target[i * 4 + 0], 2)
+                    break
+                case "3":
+                    sum += Math.abs(ref[i * 4 + 0] - target[i * 4 + 0]) < pdcThreshold ? 0 : 1
+                    break
+            }
         }
+        return sum
+    } else {
+        let refData = new Array(8).fill(new Array(8).fill(0))
+        let targetData = new Array(8).fill(new Array(8).fill(0))
+
+        for (let i = 0; i < 64; i++) {
+            refData[Math.floor(i / 8)][i % 8] = ref[i * 4 + 0]
+            targetData[Math.floor(i / 8)][i % 8] = target[i * 4 + 0]
+        }
+
+        let ans = 0
+
+        for (let i = 0; i < 8; i++) {
+            let a = 0, b = 0
+            for (let j = 0; j < 8; j++) {
+                a += refData[i][j]
+                b += targetData[i][j]
+            }
+            ans += Math.abs(a - b)
+        }
+        
+        for (let i = 0; i < 8; i++) {
+            let a = 0, b = 0
+            for (let j = 0; j < 8; j++) {
+                a += refData[j][i]
+                b += targetData[j][i]
+            }
+            ans += Math.abs(a - b)
+        }
+
+        return ans
     }
-    return sum
 }
 
 let motionVectors = []
