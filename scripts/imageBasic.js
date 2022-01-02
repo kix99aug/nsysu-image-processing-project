@@ -313,7 +313,7 @@ function resizeLinear() {
                 for (let k = 0; k <= 1; k += 1) {
                     for (let l = 0; l <= 1; l += 1) {
                         let p = getPixel(x + k, y + l)
-                        for (let m = 0; m < 3; m++) rgb[m] += p[m]
+                        for (let m = 0; m < 3; m++) rgb[m] += p[m] 
                     }
                 }
                 for (let m = 0; m < 3; m++) rgb[m] = parseInt(rgb[m] / 4)

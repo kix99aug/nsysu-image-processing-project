@@ -193,28 +193,28 @@ async function init() {
         canvas.attr("height", height)
         ctx.putImageData(newImage, 0, 0)
 
-        $("body").append($(`<div style='display:block;text-align:center'>Original image</div>`))
+        $("#row1").append($(`<div style='display:block;text-align:center'>Original image</div>`))
 
-        function newCanvas(image) {
+        function newCanvas(image,f) {
             canvas = $("<canvas></canvas>")
             ctx = canvas[0].getContext("2d")
             canvas.attr("width", image.width)
             canvas.attr("height", image.height)
             ctx.putImageData(image, 0, 0)
-            $("body").append(canvas)
+            if(!f) $("#row1").append(canvas)
             return canvas
         }
 
         let image2 = thresholding(newImage)
         newCanvas(image2)
-        $("body").append($(`<div style='display:block;text-align:center'>Otsu image</div>`))
+        $("#row1").append($(`<div style='display:block;text-align:center'>Otsu image</div>`))
 
         let [image3, items, xmin, xmax, ymin, ymax] = await findItem(image2)
 
         // newCanvas(image3)
 
         let _c = newCanvas(image3)[0]
-        $("body").append($(`<div id='a' style='display:block;text-align:center'>Find objects</div><hr>`))
+        $("#row1").append($(`<div id='a' style='display:block;text-align:center'>Find objects</div><hr>`))
         let c = _c.getContext("2d")
         c.setLineDash([3]);
         c.strokeStyle = "white"
@@ -226,8 +226,12 @@ async function init() {
 
         circles = []
 
+        let row = $("#row2")
+
         for (let i in images) {
-            _c = newCanvas(images[i])
+            let col = $("<div class='col-4 d-flex align-items-center justify-content-around'></div>")
+            row.append(col)
+            _c = newCanvas(images[i],true)
             str = ""
             str += `Width: ${xmax[i] - xmin[i]}`
             str += ` Height: ${ymax[i] - ymin[i]}`
@@ -251,12 +255,17 @@ async function init() {
                     str += ` Shape: Rectangle`
                 } else str += ` Shape: Other`
             }
+            col.append(_c)
             _c.after(`<div style='display:block;text-align:center'>${str}</div>`)
         }
 
-        $("body").append($(`<hr><div style='display:block;text-align:center'>Angle</div>`))
-        _c = newCanvas(image3)[0]
+        $("#a").after($(`<hr><div id="b" style='display:block;text-align:center'>Angle</div>`))
+        canvas = $("<canvas></canvas>")
+        canvas.attr("width", image3.width)
+        canvas.attr("height", image3.height)
+        _c = canvas[0]
         c = _c.getContext("2d")
+        c.putImageData(image3, 0, 0)
 
         console.log(circles)
         let _xmin = 0, _xmax = 0, _ymin = 0, _ymax = 0
@@ -269,7 +278,8 @@ async function init() {
 
         console.log(_xmin, _xmax, _ymin, _ymax)
 
-        c.strokeStyle = "rgb(64,64,64)"
+        c.strokeStyle = "red"
+        c.lineWidth = "3"
 
         c.beginPath()
         c.moveTo(circles[_ymax].x, circles[_ymax].y)
@@ -277,16 +287,17 @@ async function init() {
         c.stroke()
         c.closePath()
 
-        
+
         c.beginPath()
         c.moveTo(circles[_xmax].x, circles[_xmax].y)
         c.lineTo(circles[_xmin].x, circles[_xmin].y)
         c.stroke()
         c.closePath()
 
-        $("body").append($(`<div style='display:block;text-align:center'>Horizontal: ${(Math.atan(Math.abs((circles[_ymax].y - circles[_ymin].y) / (circles[_ymax].x - circles[_ymin].x))) / Math.PI * 180).toFixed(2)}⁰</div>`))
-        $("body").append($(`<div style='display:block;text-align:center'>Vertical: ${(Math.atan(Math.abs((circles[_xmax].y - circles[_xmin].y) / (circles[_xmax].x - circles[_xmin].x))) / Math.PI * 180).toFixed(2)}⁰</div>`))
-        $("body").append($(`<div style='margin-bottom:20px'></div>`))
+        $("#b").after(canvas)
+        canvas.after($(`<div style='margin-bottom:20px'></div>`))
+        canvas.after($(`<div style='display:block;text-align:center'>Vertical: ${(Math.atan(Math.abs((circles[_xmax].y - circles[_xmin].y) / (circles[_xmax].x - circles[_xmin].x))) / Math.PI * 180).toFixed(2)}⁰</div>`))
+        canvas.after($(`<div style='display:block;text-align:center'>Horizontal: ${(Math.atan(Math.abs((circles[_ymax].y - circles[_ymin].y) / (circles[_ymax].x - circles[_ymin].x))) / Math.PI * 180).toFixed(2)}⁰</div>`))
     })
 }
 

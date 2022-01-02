@@ -1,10 +1,5 @@
 function getRandomColor() {
-    var letters = '0123456789ABCDEF';
-    var color = '#';
-    for (var i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
+    return `rgb(${Math.random() * 128 + 128},${Math.random() * 128 + 128},${Math.random() * 128 + 128})`;
 }
 
 (function () {
@@ -12,14 +7,17 @@ function getRandomColor() {
     let canvas = document.querySelector("canvas#bouncingBall")
     let ctx = canvas.getContext("2d")
 
-    function randomBall() {
+    canvas.width = document.body.clientWidth
+    canvas.height = document.body.clientHeight
+
+    function randomBall(extraFast) {
         let r = Math.random() * 30 + 10
         let ball = {
             x: Math.random() * (canvas.width - r),
             y: Math.random() * (canvas.height - r),
             r: r,
             a: Math.random() * 360,
-            v: (10 + Math.random() * 30) / r,
+            v: extraFast ? 10 : (10 + Math.random() * 30) / r,
             c: getRandomColor()
         }
         balls.push(ball)
@@ -34,18 +32,22 @@ function getRandomColor() {
             if (balls[i].x <= balls[i].r) {
                 balls[i].x = balls[i].r
                 balls[i].a = 360 - balls[i].a
+                balls[i].v *= 1.01
             }
             if (balls[i].y <= balls[i].r) {
                 balls[i].y = balls[i].r
                 balls[i].a = 180 - balls[i].a
+                balls[i].v *= 1.01
             }
             if (balls[i].x + balls[i].r >= canvas.width) {
                 balls[i].x = canvas.width - balls[i].r
                 balls[i].a = 360 - balls[i].a
+                balls[i].v *= 1.01
             }
             if (balls[i].y + balls[i].r >= canvas.height) {
                 balls[i].y = canvas.height - balls[i].r
                 balls[i].a = 180 - balls[i].a
+                balls[i].v *= 1.01
             }
         }
 
@@ -87,6 +89,8 @@ function getRandomColor() {
     setInterval(move, 1)
     requestAnimationFrame(draw)
     document.addEventListener("keypress", e => {
+        // console.log(e)
         if (e.code == "Space") randomBall()
+        if (e.code == "KeyF") randomBall(true)
     })
 })()

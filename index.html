@@ -75,14 +75,11 @@
         <div class="offcanvas offcanvas-top h-100" tabindex="-1" id="project">
             <iframe class="offcanvas-body p-0" src="./project.html" frameborder="0"></iframe>
         </div>
-        <div class="offcanvas offcanvas-top h-100" tabindex="-1" id="bouncingBall">
-            <div class="offcanvas-header">
-                <h5 class="offcanvas-title"></h5>
-                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
-                    aria-label="Close"></button>
-            </div>
-            <div class="offcanvas-body d-flex justify-content-center align-items-center">
-                <canvas id="bouncingBall" width="1280" height="720"></canvas>
+        <div class="offcanvas offcanvas-top h-100 bg-dark" tabindex="-1" id="bouncingBall">
+            <button type="button" class="btn-close btn-close-white text-reset" data-bs-dismiss="offcanvas"
+                aria-label="Close" style="position: fixed;right: 10px; top:10px;"></button>
+            <div class="offcanvas-body d-flex justify-content-center align-items-center overflow-hidden">
+                <canvas id="bouncingBall" style="width: 99%; height: 99%;"></canvas>
                 <script src="./scripts/bouncingBall.js"></script>
             </div>
         </div>
