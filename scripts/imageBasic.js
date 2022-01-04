@@ -308,8 +308,8 @@ function resizeSimple() {
     let newImage = new ImageData(newWidth, newHeight)
     for (let i = 0; i < newHeight; i++) {
         for (let j = 0; j < newWidth; j++) {
-            let x = Math.floor(j / scale),
-                y = Math.floor(i / scale)
+            let x = Math.round(j / scale),
+                y = Math.round(i / scale)
             let pixel = getPixel(x, y)
             newImage.data[(i * newWidth + j) * 4 + 0] = pixel[0]
             newImage.data[(i * newWidth + j) * 4 + 1] = pixel[1]
