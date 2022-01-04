@@ -1,5 +1,5 @@
 (function setting() {
-    $("#scaleRatio").on("input", () => {
+    $("#scaleRatio,#scaleMenu input[type='radio']").on("input", () => {
         $("label[for='scaleRatio']").text("Ratio " + $("#scaleRatio").val() + "x")
         scale = parseFloat($("#scaleRatio").val())
         if ($("#scaleMenu input[type='radio']")[0].checked) {
@@ -39,7 +39,8 @@
         RGBHSV()
     })
     let ctx = Array.prototype.map.call($("#histogram .chart canvas,#histogram .chart2 canvas"), x => x.getContext("2d"))
-    let i = 0, labels = []
+    let i = 0,
+        labels = []
     while (i < 256) labels.push(i++)
     ctx.forEach((c, i) => {
         charts[i] = new Chart(c, {
@@ -113,7 +114,21 @@ function light() {
 
 }
 
+let direction = true
+
+$('#rotateMenu input[type="radio"]').on("input",e=>{
+    direction = $('#rotateMenu input[type="radio"]')[0].checked
+    rotate()
+})
+
 function rotate() {
+    let canvas = $("#rotateMenu canvas")[0]
+    let ctx = canvas.getContext("2d")
+    if (degree == 0 || degree == 360) {
+        canvas.width = image.width
+        canvas.height = image.height
+        ctx.putImageData(image, 0, 0)
+    }
     let cycle = 1,
         target = degree
     while (target > 90) {
@@ -121,26 +136,40 @@ function rotate() {
         target -= 90
     }
     let d = Math.PI / 2
-    let canvas = $("#rotateMenu canvas")[0]
-    let ctx = canvas.getContext("2d")
     let w, h
     let _image = image
 
+
     for (let k = 0; k < cycle; k++) {
         if (k == cycle - 1) d = target * (Math.PI / 180)
-        w = Math.floor(_image.width * Math.cos(d) + _image.height * Math.sin(d))
-        h = Math.floor(_image.height * Math.cos(d) + _image.width * Math.sin(d))
+        w = Math.round(_image.width * Math.cos(d) + _image.height * Math.sin(d))
+        h = Math.round(_image.height * Math.cos(d) + _image.width * Math.sin(d))
         let newImage = new ImageData(w, h)
-        let offset = _image.height * Math.sin(d)
-        for (let i = 0; i < h; i++) {
-            for (let j = 0; j < w; j++) {
-                let x = j - offset
-                let y = i
-                let _x = Math.floor(x * Math.cos(d) + y * Math.sin(d))
-                let _y = Math.floor(y * Math.cos(d) - x * Math.sin(d))
-                if (_x < -1 || _x >= _image.width + 1 || _y < -1 || _y >= _image.height + 1) continue
-                let p = getPixel(_x, _y, _image)
-                putPixel(newImage, j, i, p)
+
+        if (direction) {
+
+            let offset = Math.round(image.height * Math.sin(d))
+            for (let i = 0; i < _image.height; i++) {
+                for (let j = 0; j < _image.width; j++) {
+                    let x = Math.round(j * Math.cos(d) - i * Math.sin(d) + offset)
+                    let y = Math.round(j * Math.sin(d) + i * Math.cos(d))
+                    if (x < 0 || x > w || y < 0 || y > h) continue
+                    let p = getPixel(j + 1, i + 1, _image)
+                    putPixel(newImage, x, y, p)
+                }
+            }
+        } else {
+            let offset = _image.height * Math.sin(d)
+            for (let i = 0; i < h; i++) {
+                for (let j = 0; j < w; j++) {
+                    let x = j - offset
+                    let y = i
+                    let _x = Math.round(x * Math.cos(d) + y * Math.sin(d))
+                    let _y = Math.round(y * Math.cos(d) - x * Math.sin(d))
+                    if (_x < 0 || _x > _image.width || _y < 0 || _y > _image.height) continue
+                    let p = getPixel(_x + 1, _y + 1, _image)
+                    putPixel(newImage, j, i, p)
+                }
             }
         }
         _image = newImage
@@ -159,7 +188,7 @@ async function watermark() {
     await openImageForCompare()
     let ctx = Array.prototype.map.call($("#watermark canvas"), x => x.getContext("2d"))
     let id = [new ImageData(image.width, image.height), new ImageData(image.width, image.height), new ImageData(image.width, image.height), new ImageData(image.width, image.height),
-    new ImageData(image.width, image.height), new ImageData(image.width, image.height), new ImageData(image.width, image.height), new ImageData(image.width, image.height)
+        new ImageData(image.width, image.height), new ImageData(image.width, image.height), new ImageData(image.width, image.height), new ImageData(image.width, image.height)
     ]
 
 
@@ -200,7 +229,7 @@ function bitplane() {
     $("#bitplane canvas").attr("height", height)
     let ctx = Array.prototype.map.call($("#bitplane canvas"), x => x.getContext("2d"))
     let id = [new ImageData(image.width, image.height), new ImageData(image.width, image.height), new ImageData(image.width, image.height), new ImageData(image.width, image.height),
-    new ImageData(image.width, image.height), new ImageData(image.width, image.height), new ImageData(image.width, image.height), new ImageData(image.width, image.height)
+        new ImageData(image.width, image.height), new ImageData(image.width, image.height), new ImageData(image.width, image.height), new ImageData(image.width, image.height)
     ]
     for (let i = 0; i < image.height; i++) {
         for (let j = 0; j < image.width; j++) {
@@ -221,7 +250,7 @@ function bitplaneGrayCode() {
     $("#bitplane canvas").attr("height", height)
     let ctx = Array.prototype.map.call($("#bitplane canvas"), x => x.getContext("2d"))
     let id = [new ImageData(image.width, image.height), new ImageData(image.width, image.height), new ImageData(image.width, image.height), new ImageData(image.width, image.height),
-    new ImageData(image.width, image.height), new ImageData(image.width, image.height), new ImageData(image.width, image.height), new ImageData(image.width, image.height)
+        new ImageData(image.width, image.height), new ImageData(image.width, image.height), new ImageData(image.width, image.height), new ImageData(image.width, image.height)
     ]
     for (let i = 0; i < image.height; i++) {
         for (let j = 0; j < image.width; j++) {
@@ -242,7 +271,7 @@ function RGBHSV() {
     $("#RGBHSV canvas").attr("height", height)
     let ctx = Array.prototype.map.call($("#RGBHSV canvas"), x => x.getContext("2d"))
     let id = [new ImageData(image.width, image.height), new ImageData(image.width, image.height), new ImageData(image.width, image.height),
-    new ImageData(image.width, image.height), new ImageData(image.width, image.height), new ImageData(image.width, image.height)
+        new ImageData(image.width, image.height), new ImageData(image.width, image.height), new ImageData(image.width, image.height)
     ]
     id.forEach(ele => {
         for (let i = 0; i < ele.data.length; i += 4) {
@@ -305,19 +334,21 @@ function resizeLinear() {
     for (let i = 0; i < newHeight; i++) {
         for (let j = 0; j < newWidth; j++) {
             let x = Math.floor(j / scale),
-                y = Math.floor(i / scale)
+                y = Math.floor(i / scale),
+                a = j / scale - x,
+                b = i / scale - y
+            let ratio = [
+                [(1 - a) * (1 - b), a * (1 - b)],
+                [(1 - a) * b, a * b]
+            ]
             let rgb = [0, 0, 0]
-            if ((i * 10) % (scale * 10) == 0 && (j * 10) % (scale * 10) == 0) {
-                rgb = getPixel(x, y)
-            } else {
-                for (let k = 0; k <= 1; k += 1) {
-                    for (let l = 0; l <= 1; l += 1) {
-                        let p = getPixel(x + k, y + l)
-                        for (let m = 0; m < 3; m++) rgb[m] += p[m] 
-                    }
+            for (let k = 0; k <= 1; k++) {
+                for (let l = 0; l <= 1; l++) {
+                    let p = getPixel(x + l, y + k)
+                    for (let m = 0; m < 3; m++) rgb[m] += p[m] * ratio[k][l]
                 }
-                for (let m = 0; m < 3; m++) rgb[m] = parseInt(rgb[m] / 4)
             }
+            rgb = rgb.map(x => Math.floor(x))
             newImage.data[(i * newWidth + j) * 4 + 0] = rgb[0]
             newImage.data[(i * newWidth + j) * 4 + 1] = rgb[1]
             newImage.data[(i * newWidth + j) * 4 + 2] = rgb[2]
@@ -379,7 +410,8 @@ function negativeGrey() {
 async function snr() {
     let _image = image
     await openImageForCompare()
-    let top = 0, bot = 0
+    let top = 0,
+        bot = 0
     for (let i = 0; i < height; i++) {
         for (let j = 0; j < width; j++) {
             let p1 = getPixel(j, i, _image)
@@ -393,7 +425,10 @@ async function snr() {
     $("div#filterSize").hide()
 }
 
-let down = false, startX = 0, startY = 0, circle = false
+let down = false,
+    startX = 0,
+    startY = 0,
+    circle = false
 
 function ellipse(context, x, y, a, b) {
     context.save();
@@ -469,4 +504,3 @@ function cutInit() {
 }
 
 cutInit()
-

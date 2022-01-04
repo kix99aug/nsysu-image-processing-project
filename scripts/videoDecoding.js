@@ -1,44 +1,51 @@
-const originalImages = [], images = []
-
+let originalImages = [],
+    images = []
+let loadedFiles
 let FPS = 30
+
+let frame = 0,
+    playing
 
 let videoData
 
 let ctx = Array.prototype.map.call($("canvas"), x => x.getContext("2d"))
 
 $("#file1").on("change", async function () {
-    let loadedFiles = $("#file1")[0].files
+    loadedFiles = Array.prototype.slice.call($("#file1")[0].files).sort((a, b) => a.name.localeCompare(b.name))
+    console.log(loadedFiles)
     if (!loadedFiles[0]) return
+    let json
+    originalImages = [], images = []
+    pauseVideo()
+    frame = 0
     for (let _i = 0; _i < loadedFiles.length; _i++) {
-        let buffer = await new Response(loadedFiles[_i]).arrayBuffer()
-        let array = new Uint8Array(buffer, 8)
-        let a = array.slice(0, array.length - 126)
-        let b = array.slice(array.length - 126, array.length)
-        let image = new ImageData(256, 256)
-        let data = image.data
-        for (let i = 0; i < a.length; i++) {
-            data[i * 4 + 0] = a[i]
-            data[i * 4 + 1] = a[i]
-            data[i * 4 + 2] = a[i]
-            data[i * 4 + 3] = 255
+        if (loadedFiles[_i].type == "application/json") {
+            json = _i
+        } else {
+            let buffer = await new Response(loadedFiles[_i]).arrayBuffer()
+            let array = new Uint8Array(buffer, 8)
+            let a = array.slice(0, array.length - 126)
+            let b = array.slice(array.length - 126, array.length)
+            let image = new ImageData(256, 256)
+            let data = image.data
+            for (let i = 0; i < a.length; i++) {
+                data[i * 4 + 0] = a[i]
+                data[i * 4 + 1] = a[i]
+                data[i * 4 + 2] = a[i]
+                data[i * 4 + 3] = 255
+            }
+            originalImages.push(image)
         }
-        originalImages.push(image)
     }
     ctx[0].putImageData(originalImages[0], 0, 0)
-    $("#file2").on("change", async function () {
-        let file = $(this)[0].files[0]
-        let data = await (new Response(file).json())
-        images.push(originalImages[0])
-        videoData = data
-        decode()
-        draw()
-    })
-    $("#file2").click()
+    let file = loadedFiles[json]
+    let data = await (new Response(file).json())
+    images.push(originalImages[0])
+    videoData = data
+    decode()
+    draw()
 })
 
-
-
-let frame = 0, playing
 
 function pauseVideo() {
     playing = false
@@ -75,7 +82,7 @@ ctx[2].fillStyle = "rgba(0,0,0,0.5)";
 
 
 function draw() {
-    $("#frame").text(`Current frame #${frame+1}`)
+    $("#frame").text(`Current frame #${frame + 1}`)
     ctx[2].clearRect(0, 0, 256, 256)
     drawMotionVectorBG()
     ctx[1].clearRect(0, 0, 256, 256)
@@ -116,7 +123,10 @@ function psnr(ref, target) {
     mse /= 256 * 256
     return 10 * Math.log10(255 * 255 / mse)
 }
-let chartData = [], chartLabel = [], backgroundColor = [], chart
+let chartData = [],
+    chartLabel = [],
+    backgroundColor = [],
+    chart
 
 function decode() {
     console.log("decode")

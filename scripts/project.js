@@ -298,6 +298,9 @@ async function init() {
         canvas.after($(`<div style='margin-bottom:20px'></div>`))
         canvas.after($(`<div style='display:block;text-align:center'>Vertical: ${(Math.atan(Math.abs((circles[_xmax].y - circles[_xmin].y) / (circles[_xmax].x - circles[_xmin].x))) / Math.PI * 180).toFixed(2)}⁰</div>`))
         canvas.after($(`<div style='display:block;text-align:center'>Horizontal: ${(Math.atan(Math.abs((circles[_ymax].y - circles[_ymin].y) / (circles[_ymax].x - circles[_ymin].x))) / Math.PI * 180).toFixed(2)}⁰</div>`))
+
+        $("#spinner").hide()
+        $("main").show()
     })
 }
 

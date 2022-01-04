@@ -13,15 +13,20 @@ let ctxLb = $("#lb > div > canvas")[0].getContext("2d")
 let ctxRb = $("#rb > div > canvas")[0].getContext("2d")
 
 let FPS = 30
-const images = [], filenames = []
+let images = []
+let motionVectors = []
 let frame = 0, playing
 let ctx = Array.prototype.map.call($("canvas"), x => x.getContext("2d"))
 
 file.addEventListener("change", async e => {
     let loadedFiles = file.files
     if (!loadedFiles[0]) return
+    images = []
+    motionVectors = []
+    frame = 0
+    playing = false
+    loadedFiles = Array.prototype.slice.call(file.files).sort((a, b) => a.name.localeCompare(b.name))
     for (let _i = 0; _i < loadedFiles.length; _i++) {
-        filenames.push(loadedFiles[_i].name)
         let buffer = await new Response(loadedFiles[_i]).arrayBuffer()
         let array = new Uint8Array(buffer, 8)
         let a = array.slice(0, array.length - 126)
@@ -151,7 +156,7 @@ function compare(ref, target, pdcThreshold) {
             }
             ans += Math.abs(a - b)
         }
-        
+
         for (let i = 0; i < 8; i++) {
             let a = 0, b = 0
             for (let j = 0; j < 8; j++) {
@@ -165,7 +170,6 @@ function compare(ref, target, pdcThreshold) {
     }
 }
 
-let motionVectors = []
 
 function encode() {
     if (!images[frame + 1]) {
