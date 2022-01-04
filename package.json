@@ -1,0 +1,24 @@
+{
+  "name": "project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kix99aug/nsysu-image-processing-project.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kix99aug/nsysu-image-processing-project/issues"
+  },
+  "homepage": "https://github.com/kix99aug/nsysu-image-processing-project#readme",
+  "devDependencies": {
+    "electron": "^16.0.6",
+    "electron-builder": "^22.14.5",
+    "electron-packager": "^15.4.0"
+  }
+}

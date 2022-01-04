@@ -10,8 +10,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
         crossorigin="anonymous"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <title>Image Processing Project</title>
+    <link rel="stylesheet" href="./stylesheets/general.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>Image Processing Project</title>
     <style>
         #lenna {
             border-radius: 50%;
@@ -47,6 +48,15 @@
 </head>
 
 <body class="d-flex justify-content-center align-items-center bg-dark" style="width: 100vw; height: 100vh; ">
+    <button type="button" class="btn-close btn-close-white text-reset" onclick="window.close()"
+        style="position: absolute;right: 10px; top:10px;"></button>
+    <button type="button" class="btn-close btn-minus btn-close-white text-reset" onclick="window.api.send('minimize')"
+        style="position: absolute;right: 50px; top:10px;"></button>
+    <style>
+        .btn-minus {
+            background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='4 4 8 8' fill='%23000'%3e%3cpath d='M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z'/%3e%3c/svg%3e") center/1em auto no-repeat;
+        }
+    </style>
     <main class="d-flex flex-column w-100 h-50 justify-content-around align-items-center">
         <div class="d-flex w-50 justify-content-center align-items-center">
             <img id="lenna" class="img-fluid w-25" src="./images/bmp/24-lena.bmp" alt="">
@@ -59,35 +69,35 @@
         <div class="w-75">
             <div class="col mt-5 d-flex justify-content-around">
 
-                <a class="btn btn-secondary btn-lg" style="width:15rem" href="#image"
+                <a class="btn btn-secondary btn-lg" style="width:15rem;background: #DB4D6D;" href="#image"
                     data-bs-toggle="offcanvas">Image</a>
-                <a class="btn btn-secondary btn-lg" style="width:15rem" href="#videoEncoding"
+                <a class="btn btn-secondary btn-lg" style="width:15rem;background: #E79460;" href="#videoEncoding"
                     data-bs-toggle="offcanvas">Video Encoding</a>
-                <a class="btn btn-secondary btn-lg" style="width:15rem" href="#videoDecoding"
+                <a class="btn btn-secondary btn-lg" style="width:15rem;background: #F6C555;" href="#videoDecoding"
                     data-bs-toggle="offcanvas">Video Decoding</a>
             </div>
             <div class="col mt-5 d-flex justify-content-around">
 
-                <a class="btn btn-secondary btn-lg" style="width:15rem" href="#project"
+                <a class="btn btn-secondary btn-lg" style="width:15rem;background: #24936E;" href="#project"
                     data-bs-toggle="offcanvas">Project</a>
-                <a class="btn btn-secondary btn-lg" style="width:15rem" href="#bouncingBall"
-                    data-bs-toggle="offcanvas">Bouncing Ball</a>
-                <a class="btn btn-secondary btn-lg" style="width:15rem" href="./images.zip"
+                <a class="btn btn-secondary btn-lg" style="width:15rem;background: #51A8DD;" href="#bouncingBall"
+                    onclick="ballInit()" data-bs-toggle="offcanvas">Bouncing Ball</a>
+                <a class="btn btn-secondary btn-lg" style="width:15rem;background: #B481BB;" href="./images.zip"
                     data-bs-toggle="offcanvas">Download Images</a>
             </div>
         </div>
 
         <div class="offcanvas offcanvas-top h-100" tabindex="-1" id="videoDecoding">
-            <iframe class="offcanvas-body p-0" data-src="./videoDecoding.html" frameborder="0"></iframe>
+            <iframe class="offcanvas-body p-0" src="./videoDecoding.html" frameborder="0"></iframe>
         </div>
         <div class="offcanvas offcanvas-top h-100" tabindex="-1" id="videoEncoding">
-            <iframe class="offcanvas-body p-0" data-src="./videoEncoding.html" frameborder="0"></iframe>
+            <iframe class="offcanvas-body p-0" src="./videoEncoding.html" frameborder="0"></iframe>
         </div>
         <div class="offcanvas offcanvas-top h-100" tabindex="-1" id="image">
-            <iframe class="offcanvas-body p-0" data-src="./image.html" frameborder="0"></iframe>
+            <iframe class="offcanvas-body p-0" src="./image.html" frameborder="0"></iframe>
         </div>
         <div class="offcanvas offcanvas-top h-100" tabindex="-1" id="project">
-            <iframe class="offcanvas-body p-0" data-src="./project.html" frameborder="0"></iframe>
+            <iframe class="offcanvas-body p-0" src="./project.html" frameborder="0"></iframe>
         </div>
         <div class="offcanvas offcanvas-top h-100 bg-dark" tabindex="-1" id="bouncingBall">
             <button type="button" class="btn-close btn-close-white text-reset" data-bs-dismiss="offcanvas"
@@ -112,6 +122,11 @@
                 let iframe = $($(this).attr("href") + " iframe")
                 iframe.attr("src", iframe.data("src"))
             })
+
+            window.api.receive("fromMain", (data) => {
+                console.log(`Received ${data} from main process`);
+            });
+            window.api.send("toMain", "some data");
         </script>
 </body>
 

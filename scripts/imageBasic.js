@@ -437,7 +437,7 @@ function ellipse(context, x, y, a, b) {
     var ratioY = b / r;
     context.scale(ratioX, ratioY);
     context.beginPath();
-    context.arc(x / ratioX, y / ratioY, r, 0, 2 * Math.PI, false);
+    context.arc(x / ratioX, y / ratioY, Math.abs(r), 0, 2 * Math.PI, false);
     context.closePath();
     context.restore();
     context.stroke();
@@ -484,6 +484,9 @@ function cutInit() {
         newCanvas.width = newImage.width
         newCanvas.height = newImage.height
         let newCtx = newCanvas.getContext("2d")
+
+        startX = startX > e.offsetX ? e.offsetX : startX
+        startY = startY > e.offsetY ? e.offsetY : startY
 
         for (let i = 0; i < newImage.height; i++) {
             for (let j = 0; j < newImage.width; j++) {

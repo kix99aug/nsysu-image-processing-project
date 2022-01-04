@@ -2,28 +2,14 @@ function getRandomColor() {
     return `rgb(${Math.random() * 128 + 128},${Math.random() * 128 + 128},${Math.random() * 128 + 128})`;
 }
 
-(function () {
-    let balls = []
+let balls = []
+
+function ballPrepare() {
     let canvas = document.querySelector("canvas#bouncingBall")
     let ctx = canvas.getContext("2d")
 
     canvas.width = document.body.clientWidth
     canvas.height = document.body.clientHeight
-
-    function randomBall(extraFast) {
-        let r = Math.random() * 30 + 10
-        let ball = {
-            x: Math.random() * (canvas.width - r),
-            y: Math.random() * (canvas.height - r),
-            r: r,
-            a: Math.random() * 360,
-            v: extraFast ? 10 : (10 + Math.random() * 30) / r,
-            c: getRandomColor()
-        }
-        balls.push(ball)
-    }
-
-    for (let i = 0; i < 5; i++) randomBall()
 
     function move() {
         for (let i in balls) {
@@ -93,4 +79,25 @@ function getRandomColor() {
         if (e.code == "Space") randomBall()
         if (e.code == "KeyF") randomBall(true)
     })
-})()
+}
+
+function randomBall(extraFast) {
+    let r = Math.random() * 30 + 10
+    let ball = {
+        x: Math.random() * (document.querySelector("canvas#bouncingBall").width - r),
+        y: Math.random() * (document.querySelector("canvas#bouncingBall").height - r),
+        r: r,
+        a: Math.random() * 360,
+        v: extraFast ? 10 : (10 + Math.random() * 30) / r,
+        c: getRandomColor()
+    }
+    balls.push(ball)
+}
+
+function ballInit() {
+    balls = []
+    for (let i = 0; i < 5; i++) randomBall()
+}
+
+ballInit()
+ballPrepare()

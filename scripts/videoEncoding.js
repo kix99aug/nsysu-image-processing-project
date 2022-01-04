@@ -295,6 +295,10 @@ function encode() {
     setTimeout(a, 1);
 }
 
+$("#save").click(e => {
+    downloadObjectAsJson({ motionVectors: motionVectors }, "mv")
+})
+
 
 $("[name='first']").click(() => {
     playing = false
@@ -341,6 +345,16 @@ function drawMotionVectorBG() {
             ctx[4].closePath()
         }
     }
+}
+
+function downloadObjectAsJson(exportObj, exportName) {
+    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));
+    var downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", exportName + ".json");
+    document.body.appendChild(downloadAnchorNode); // required for firefox
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
 }
 
 $(drawMotionVectorBG)
