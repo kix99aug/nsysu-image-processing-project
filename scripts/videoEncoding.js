@@ -27,6 +27,7 @@ file.addEventListener("change", async e => {
     playing = false
     loadedFiles = Array.prototype.slice.call(file.files).sort((a, b) => a.name.localeCompare(b.name))
     for (let _i = 0; _i < loadedFiles.length; _i++) {
+        if (loadedFiles[_i].type == "application/json") continue
         let buffer = await new Response(loadedFiles[_i]).arrayBuffer()
         let array = new Uint8Array(buffer, 8)
         let a = array.slice(0, array.length - 126)
